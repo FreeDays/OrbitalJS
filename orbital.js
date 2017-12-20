@@ -69,8 +69,12 @@ function e(name) {
 		if (element_type === class_sign) {
 			var elements_class = name.replace(".","");
 			var elements = document.getElementsByClassName(elements_class);
+			var class_array = [];
 			if (typeof elements !== "undefined" || elements !== null) {
-				return elements;
+				for (var i = 0; i < elements.length; i++) {
+				  class_array.push(elements[i]);
+				}
+				return class_array;
 			}
 			else {
 				throw "Error[#2540]: Element with class or id {" + name + "} does not exist.";
@@ -314,7 +318,89 @@ function stringBlast(string) {
 	}
 }
 
+function r_str(lng) {
+  var list = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+  var nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  var randomNumber = Math.floor(Math.random() * nums.length) + 0;
+  var randomLetter = Math.floor(Math.random() * list.length) + 0;
+  return list[randomLetter] + nums[randomNumber];
+}
 
-setInterval(function() {
-	e("#txt").innerHTML = stringBlast("Ondrej");
-}, 750);
+function generateClass(length) {
+  if (typeof length === "undefined") {  
+    console.log("Class Generation Error[x800]: Undefined length of string to generate.");
+  }
+    
+  else {   
+    var array = [];
+    for (var i = 0; i < length / 2; i++) {   
+      array[i] = r_str();
+    } 
+    var pattern = array.toString(); 
+    var string = pattern.replace(/,/g, ""); 
+    return string;
+  }
+}
+
+function url_type(url) {
+	try {
+		var is_http = (url.includes("http://") === true) ? true : false;
+		var is_https = (url.includes("https://") === true) ? true : false;
+		var is_ftp = (url.includes("ftp://") === true) ? true : false;
+		var is_www = (url.includes("www.") === true) ? true : false;
+		var is_file = (url.includes("file:///") === true) ? true : false;
+		
+		if (is_http) {
+			return "http";
+		}
+		else if (is_https) {
+			return "https";
+		}
+		else if (is_ftp) {
+			return "ftp";
+		}
+		else if (is_www) {
+			return "www";
+		}
+		else if (is_file) {
+			return "file";
+		}
+		else {
+			throw "Error[#4834]: Undefined type of Protocol in given URL {" + url + "}";
+		}
+	}
+	catch (error) {
+		console.log("%c" + error, "color: #FF0000;");
+	}
+}
+
+function is_served_securely() {
+	try {
+		var scripts = document.getElementsByTagName("script");
+		var secure_url = 0;
+		var unsecure_url = 0;
+		for (var i = 0; i < scripts.length ; i++) {
+			if (url_type(scripts[i].src) === "https") {
+				secure_url += 1;
+			}		
+			else {
+				unsecure_url += 1;
+			}
+		}
+		if (unsecure_url > 0 && secure_url > 0) {
+			console.log("%c Some scripts are not loaded securely.", "color: #FFFFFF; background-color: #f6a745; font-family: Verdana;");
+		}
+		else if (unsecure_url === 0 && secure_url > 0) {
+			console.log("%c All scripts loaded securely.", "color: #FFFFFF; background-color: #a0db8e; font-family: Verdana;");
+		}
+		else if (secure_url === 0 && unsecure_url > 0) {
+			console.log("%c Scripts are not loaded securely.", "color: #FFFFFF; background-color: #ff4444; font-family: Verdana;");
+		}
+		else {
+			throw "Error[#8874]: Error in URL checking {" + url + "}";
+		}
+	}
+	catch (error) {
+		console.log("%c" + error, "color: #FF0000;");
+	}
+}
