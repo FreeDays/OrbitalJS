@@ -9,25 +9,25 @@
  
  OrbitalJS is under Creative Commons Attribution 4.0 International license. For more info, please visit [https://creativecommons.org/licenses/by/4.0/legalcode]
  
- 	|//////  \\\\\\|
-	|/////  \\\\\|
-	|////  \\\\|
-	|///  \\\|
-	|//  \\|
-	|/  \|
-	|/  \|
+ 	|//////   \\\\\\|
+	|/////   \\\\\|
+	|////   \\\\|
+	|///   \\\|
+	|//   \\|
+	|/   \|
+	|/   \|
 	|//  \\|
 	|///  \\\|
 	|////  \\\\|
 	|/////  \\\\\
 	|//////  \\\\\|
- 	|//////  \\\\\\|
-	|/////  \\\\\|
-	|////  \\\\|
-	|///  \\\|
-	|//  \\|
-	|/  \|
-	|/  \|
+ 	|//////   \\\\\\|
+	|/////   \\\\\|
+	|////   \\\\|
+	|///   \\\|
+	|//   \\|
+	|/   \|
+	|/   \|
 	|//  \\|
 	|///  \\\|
 	|////  \\\\|
@@ -38,28 +38,70 @@
 	|////  \\\\|
 	|///  \\\|
 	|//  \\|
-	|/  \|
-	|/  \|
-	|//  \\|
-	|///  \\\|
-	|////  \\\\|
-	|/////  \\\\\
-	|//////  \\\\\|
+	|/   \|
+	|/   \|
+	|//   \\|
+	|///   \\\|
+	|////   \\\\|
+	|/////   \\\\\
+	|//////   \\\\\|
  	|//////  \\\\\\|
 	|/////  \\\\\|
 	|////  \\\\|
 	|///  \\\|
 	|//  \\|
 	|/  \|
-	|/  \|
-	|//  \\|
-	|///  \\\|
-	|////  \\\\|
-	|/////  \\\\\|
-	|//////  \\\\\\|
+	|/   \|
+	|//   \\|
+	|///   \\\|
+	|////   \\\\|
+	|/////   \\\\\|
+	|//////   \\\\\\|
 	
  
 */
+
+var cookie = {
+	create: function(name, value, expiration, path) {
+		try {
+			var isUndefined = (name === undefined || value === undefined || expiration === undefined) ? true : false;
+			var isPath = (path === undefined) ? false : true;
+			if (isUndefined && isPath) {
+				document.cookie = name + "=" + value + ";" + expiration + ";" + path;
+			}
+			else if (isUndefined && isPath === false) {
+				document.cookie = name + "=" + value + ";" + expiration + ";path=/";
+			}
+			else {
+				throw "Error[#4721]: Cookie values aren't defined correctly.";
+			}
+		}
+		catch (error) {
+			console.log("%c" + error, "color: #FF0000;");
+		}
+	},
+	
+	value: function(name) {
+		try {
+			name = name + "=";
+			var decodedCookie = decodeURIComponent(document.cookie);
+			var a = decodedCookie.split(';');
+			for(var i = 0; i < a.length; i++) {
+				var c = a[i];
+				while (c.charAt(0) == ' ') {
+					c = c.substring(1);
+				}
+				if (c.indexOf(name) == 0) {
+					return c.substring(name.length, c.length);
+				}
+			}
+			return "";		
+		}
+		catch (error) {
+			console.log("%c" + error, "color: #FF0000;");
+		}	
+	}
+};
 
 function e(name) {
 	var element_type = name.substr(0,1);
@@ -67,18 +109,8 @@ function e(name) {
 	var id_sign = "#";
 	try {
 		if (element_type === class_sign) {
-			var elements_class = name.replace(".","");
-			var elements = document.getElementsByClassName(elements_class);
-			var class_array = [];
-			if (typeof elements !== "undefined" || elements !== null) {
-				for (var i = 0; i < elements.length; i++) {
-				  class_array.push(elements[i]);
-				}
-				return class_array;
-			}
-			else {
-				throw "Error[#2540]: Element with class or id {" + name + "} does not exist.";
-			}
+			var class_name = name.replace(".","");
+			return document.getElementsByClassName(class_name);
 		}
 		else if (element_type === id_sign) {
 			var element_id = name.replace("#","");
@@ -100,6 +132,7 @@ function e(name) {
 }
 
 function textColor(element, colorValue) {
+	element = e(element);
 	var is_hexadecimal = (colorValue.substr(0,1) === "#" && colorValue.length === 7) ? true : false;
 	var is_rgb = (colorValue.substr(0,3) === "rgb" && colorValue.substr(0,4) !== "rgba" && colorValue.length > 10) ? true : false;
 	var is_rgba = (colorValue.substr(0,4) === "rgba" && colorValue.length > 13) ? true : false;
@@ -112,22 +145,48 @@ function textColor(element, colorValue) {
 	"lightred", "lightpurple", "lightblack", "lightblue", "lightpink", "lightgreen", "lightgrey", "lightorange", "lightyellow", "lightbrown",
 	"darkred", "darkpurple", "darkblue", "darkpink", "darkgreen", "darkgrey", "darkorange", "darkyellow", "darkbrown"];
 	try {
-		var scripts = document.getElementsByTagName("script");
-		var is_loaded;
-		for (var i = 0; i < scripts.length; i++) {
-			if (scripts[i].src.includes("w3.js")) {
-				is_loaded = true;
-			}
-			else {
-				is_loaded = false;
-				throw "Error[#5248]: You must include w3.js to use NCol values.";
-			}
+		if (is_ncol) {
+			var scripts = document.getElementsByTagName("script");
+			var is_loaded = false;
+			for (var i = 0; i < scripts.length; i++) {
+				if (scripts[i].src.includes("w3.js")) {
+					is_loaded = true;
+				}
+				else {
+					is_loaded = false;
+					throw "Error[#5248]: You must include w3.js to use NCol values.";
+				}
+			}		
 		}
-		if (is_hexadecimal || is_rgb || is_rgba || is_hsl || is_hwb || is_cmyk || is_ncol) {
-			element.style.color = colorValue;
+		if (is_hexadecimal || is_rgb || is_rgba || is_hsl || is_hwb || is_cmyk || is_ncol && is_loaded === true) {
+			var i = element.length;
+			while (i--) {
+				element[i].style.color = colorValue;
+			}
 		}
 		else {
 			throw "Error[#4785]: Unknown color value type {" + colorValue + "}";
+		}
+	}
+	catch (error) {
+		console.log("%c" + error, "color: #FF0000;");
+	}
+}
+
+function html(element, string) {
+	try {
+		element = e(element);
+		if (typeof string !== "undefined" && string !== undefined) {
+			var i = element.length;
+			while (i--) {
+				element[i].innerHTML = string;
+			}
+		}
+		else {
+			var i = element.length;
+			while (i--) {
+				return element[i].innerHTML;
+			}		
 		}
 	}
 	catch (error) {
@@ -234,6 +293,7 @@ function random(min, max) {
 }
 
 function fadeIn(element, timing_function) {
+	element = e(element);
 	var is_miliseconds = (timing_function.substr(timing_function.length - 2, timing_function.length) === "ms") ? true : false;
 	var is_seconds = (timing_function.substr(timing_function.length - 1, timing_function.length) === "s") ? true : false;
 	try {
@@ -241,13 +301,19 @@ function fadeIn(element, timing_function) {
 			throw "Error[#2540]: Element with class or id {" + name + "} does not exist.";
 		}
 		else if (timing_function === "fast" || timing_function === "slow") {
+			var i = element.length;
 			var timing_string = (timing_function === "fast") ? "700ms" : "2s";
-			element.style.opacity = "1";
-			element.style.transition = "opacity " + timing_string;
+			while (i--) {
+				element[i].style.opacity = "1";
+				element[i].style.transition = "opacity " + timing_string;
+			}
 		}
 		else if (is_miliseconds || is_seconds) {
-			element.style.opacity = "1";
-			element.style.transition = "opacity " + timing_function;		
+			var i = e(element).length;
+			while (i--) {
+				e(element).style.opacity = "1";
+				e(element).style.transition = "opacity " + timing_function;		
+			}
 		}
 		else {
 			throw "Error[#4789]: Unknown timing expression {" + timing_function + "}";
@@ -259,6 +325,7 @@ function fadeIn(element, timing_function) {
 }
 
 function fadeOut(element, timing_function) {
+	element = e(element);
 	var is_miliseconds = (timing_function.substr(timing_function.length - 2, timing_function.length) === "ms") ? true : false;
 	var is_seconds = (timing_function.substr(timing_function.length - 1, timing_function.length) === "s") ? true : false;
 	try {
@@ -266,13 +333,19 @@ function fadeOut(element, timing_function) {
 			throw "Error[#2540]: Element with class or id {" + name + "} does not exist.";
 		}
 		else if (timing_function === "fast" || timing_function === "slow") {
+			var i = element.length;
 			var timing_string = (timing_function === "fast") ? "700ms" : "2s";
-			element.style.opacity = "0";
-			element.style.transition = "opacity " + timing_string;
+			while (i--) {
+				element[i].style.opacity = "0";
+				element[i].style.transition = "opacity " + timing_string;
+			}
 		}
 		else if (is_miliseconds || is_seconds) {
-			element.style.opacity = "0";
-			element.style.transition = "opacity " + timing_function;		
+			var i = e(element).length;
+			while (i--) {
+				e(element).style.opacity = "0";
+				e(element).style.transition = "opacity " + timing_function;		
+			}
 		}
 		else {
 			throw "Error[#4789]: Unknown timing expression {" + timing_function + "}";
@@ -280,7 +353,7 @@ function fadeOut(element, timing_function) {
 	}
 	catch (error) {
 		console.log("%c" + error, "color: #FF0000;");
-	}	
+	}		
 }
 
 function stringBlast(string) {
@@ -328,7 +401,7 @@ function r_str(lng) {
 
 function generateClass(length) {
   if (typeof length === "undefined") {  
-    console.log("Class Generation Error[x800]: Undefined length of string to generate.");
+    throw "Class Generation Error[x800]: Undefined length of string to generate.";
   }
     
   else {   
@@ -398,6 +471,92 @@ function is_served_securely() {
 		}
 		else {
 			throw "Error[#8874]: Error in URL checking {" + url + "}";
+		}
+	}
+	catch (error) {
+		console.log("%c" + error, "color: #FF0000;");
+	}
+}
+
+function Countdown(goal, output) {
+	try {
+		var end = new Date(goal).getTime();
+		var current_time = new Date().getTime();
+		
+		if (end < current_time) {
+			throw "Error[#4715]: Sorry, but you cannot countdown back to history :(. Good old days are gone.";
+		}
+		
+		var difference = end - current_time;
+		
+		var years = Math.floor(difference / (1000 * 60 * 60 * 24 * 365));
+		var months = Math.floor(difference / (1000 * 60 * 60 * 24 * 365 / 12));
+		var days = Math.floor(difference % (1000 * 60 * 60 * 24 * 365) / (1000 * 60 * 60 * 24));
+		var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+		var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+		var miliseconds = Math.floor(difference % (1000 * 60));
+
+		if (output === "String" || output === "string") {
+			return days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds.";
+		}
+		else if (output === "fullString" || output === "FullString" || output === "fullstring") {
+			return years + " Years, " + months + " Months, " + days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds, " + miliseconds + " Miliseconds.";
+		}
+		else if (output === "mdy" || output === "MDY") {
+			return months + "/" + days + "/" + years + " " + hours + ":" + minutes + ":" + seconds;
+		}
+		else if (output === "ymd" || output === "YMD") {
+			return years + "/" + months + "/" + days + " " + hours + ":" + minutes + ":" + seconds;
+		}
+		else if (output === "dmy" || output === "DMY") {
+			return days + "/" + months + "/" + years + " " + hours + ":" + minutes + ":" + seconds;
+		}
+		else if (output === "Raw" || output === "raw") {
+			return difference;
+		}
+		else if (output === undefined && goal !== undefined) {
+			var dateValues = {
+				years: years,
+				months: months,
+				days: days,
+				hours: hours,
+				minutes: minutes,
+				seconds: seconds
+			};
+			
+			return dateValues;
+		}
+		else if (goal === undefined) {
+			throw "Error[#8415]: You must specify your goal date.";
+		}
+		else {
+			throw "Error[#8745]: Undefined output type {" + output + "}.";
+		}
+	}
+	catch (error) {
+		console.log("%c" + error, "color: #FF0000;");
+	}
+}
+
+function interval(func, time) {
+	try {
+		time_isNumber = (typeof time === "number") ? true : false;
+		time_isString = (typeof time === "string") ? true : false;
+		if (time_isString && time.includes("s") && time.substr(time.length - 1, time.length) === "s") {
+			var excludedString = time.replace("s", "");
+			var convertedNum = parseInt(excludedString);
+			time = convertedNum * 1000;
+		}
+		else if (time_isNumber && time > 0) {
+			time = time;
+		}
+		else {
+			throw "Error[#1715]: Undefined data type of time {" + typeof time + "}.";
+		}
+		if (typeof func === "function" && func !== undefined && time !== undefined) {
+			
+			setInterval(func, time);
 		}
 	}
 	catch (error) {
